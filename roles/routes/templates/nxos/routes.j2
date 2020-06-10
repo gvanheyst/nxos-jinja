@@ -1,0 +1,16 @@
+!! BEGIN L3 Routes
+!
+{% if static is defined %}
+{% for item in static %}
+{% if item.vrf is defined %}
+vrf context {{ item.vrf }}
+ip route {{ item.ip }} {{ item.subnet }} {{ item.nh }} {% if item.description is defined %}name {{ item.description }} {% endif %}
+
+{% else %}
+ip route {{ item.ip }} {{ item.subnet }} {{ item.nh }} {% if item.description is defined %}name {{ item.description }} {% endif %}
+
+{% endif %}
+{% endfor %}
+!
+{% endif %}
+!! END DNS

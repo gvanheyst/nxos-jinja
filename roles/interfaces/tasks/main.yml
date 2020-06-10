@@ -1,0 +1,6 @@
+---
+- name: Compile Interface config
+  delegate_to: localhost
+  template: src={{ os }}/interfaces.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_interfaces.cfg
+  tags:
+    - compile

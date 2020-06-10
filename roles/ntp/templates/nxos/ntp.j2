@@ -1,0 +1,12 @@
+!!BEGIN NTP
+clock timezone GMT 0 0
+{% if mgmt_vrf is defined %}
+{% for server in global.ntpserver %}
+ntp server {{ server }} use-vrf {{ mgmt_vrf }}
+{% endfor %}
+{% else %}
+{% for server in global.ntpserver %}
+ntp server {{ server }}
+{% endfor %}
+{% endif %}
+!!END NTP

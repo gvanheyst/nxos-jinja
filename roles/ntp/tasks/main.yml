@@ -1,0 +1,7 @@
+---
+- name: Compile NTP config
+  delegate_to: localhost
+  template: src={{ os }}/ntp.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_ntp.cfg
+  tags:
+    - compile
+

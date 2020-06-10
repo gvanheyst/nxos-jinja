@@ -1,0 +1,18 @@
+!!BEGIN MONITORING
+login on-failure log
+login on-success log
+logging console 2
+logging monitor 7
+logging level all 6
+{% if mgmt_int is defined %}
+    {% if mgmt_vrf is defined %}
+logging source-interface {{ mgmt_int }}
+logging server {{ global.logging.ip }} {{ global.logging.level }} port {{ global.logging.port }} use-vrf {{ mgmt_vrf }}
+    {% else %}
+logging source-interface {{ mgmt_int }}
+logging server {{ global.logging.ip }} {{ global.logging.level }} port {{ global.logging.port }}
+    {% endif %}
+{% else %}
+logging server {{ global.logging.ip }} {{ global.logging.level }} port {{ global.logging.port }}
+{% endif %}
+!!END MONITORING

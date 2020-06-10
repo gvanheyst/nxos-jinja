@@ -1,0 +1,6 @@
+---
+- name: Compile L2 VLANS config
+  delegate_to: localhost
+  template: src={{ os }}/vlans.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_010vlans.cfg
+  tags:
+    - compile

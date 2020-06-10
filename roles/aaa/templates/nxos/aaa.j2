@@ -1,0 +1,21 @@
+!! BEGIN AAA Configuration from Template
+!
+aaa group server tacacs+ {{ global.aaa.groupname }}
+{% for server in global.aaa.ciscoise %}
+ tacacs-server host {{ server }}
+{% endfor %}
+{% if mgmt_int is defined %}
+source-interface {{ mgmt_int }}
+{% endif %}
+{% if mgmt_vrf is defined %}
+use-vrf {{ mgmt_vrf }}
+{% endif %}
+!
+!
+
+aaa authentication login default group {{ global.aaa.groupname }}
+aaa authentication login console local
+aaa accounting default group {{ global.aaa.groupname }}
+aaa authorization commands default group {{ global.aaa.groupname }} local
+!
+!! END AAA

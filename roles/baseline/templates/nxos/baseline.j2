@@ -1,0 +1,67 @@
+!! BEGIN BASELINE
+!
+
+feature privilege
+feature tacacs+
+cfs eth distribute
+feature interface-vlan
+feature hsrp
+feature lacp
+feature vpc
+feature lldp
+feature udld
+feature nxapi
+feature bfd
+feature scp-server
+feature telemetry
+!
+hostname {{ global.hostname }}
+enable secret {{ global.enable_pass }}
+username admin priv-lvl 15 password {{ global.fallback.password }}
+username {{ global.fallback.user }} priv-lvl 15 password {{ global.fallback.password }}
+username cisco priv-lvl 15 password Cisco123
+!
+cli alias name wri copy run start
+cli alias name q exit
+cli alias name wr copy run start
+!
+errdisable detect cause all
+errdisable recovery cause all
+errdisable recovery interval 300
+!
+spanning-tree mode rapid-pvst
+spanning-tree loopguard default
+spanning-tree portfast default
+spanning-tree port type edge bpduguard default
+{% if stp_root is defined %}
+spanning-tree vlan 1-3967 root {{ stp_root }}
+{% endif %}
+!
+hsrp bfd all-interfaces
+!
+{% if vrfs is defined %}
+{% for item in vrfs %}
+vrf context {{ item.name }}
+ description {{ item.description }}
+{% endfor %}
+{% endif %}
+!
+{% if vpc is defined %}
+vpc domain {{ vpc.domain }}
+{% if vpc.vrf is defined %}
+ peer-keepalive destination {{ vpc.neigh }} source {{ vpc.ip }} vrf {{ vpc.vrf }}
+{% else %}
+ peer-keepalive destination {{ vpc.neigh }} source {{ vpc.ip }}
+{% endif %}
+{% if vpc.master is defined %}
+ ! system-priority 4000
+{% endif %}
+ peer-gateway
+ fast-convergence
+ delay restore 360
+ auto-recovery
+ graceful consistency-check
+ ip arp synchronize
+{% endif %}
+!
+!!END BASELINE

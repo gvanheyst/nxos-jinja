@@ -1,0 +1,7 @@
+---
+- name: Compile Baseline config
+  delegate_to: localhost
+  template: src={{ os }}/baseline.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_000baseline.cfg
+  tags:
+    - compile
+

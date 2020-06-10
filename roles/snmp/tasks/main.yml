@@ -1,0 +1,7 @@
+---
+- name: Compile SNMP config
+  delegate_to: localhost
+  template: src={{ os }}/snmp.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_snmp.cfg
+  tags:
+    - compile
+

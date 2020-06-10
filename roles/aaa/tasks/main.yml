@@ -1,0 +1,7 @@
+---
+- name: Compile AAA config
+  delegate_to: localhost
+  template: src={{ os }}/aaa.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_aaa.cfg
+  tags:
+    - compile
+

@@ -1,0 +1,7 @@
+---
+- name: Compile Banner config
+  delegate_to: localhost
+  template: src={{ os }}/banners.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_banners.cfg
+  tags:
+    - compile
+

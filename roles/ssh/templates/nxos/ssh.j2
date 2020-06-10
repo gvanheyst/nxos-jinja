@@ -1,0 +1,7 @@
+!! BEGIN SSH
+!
+crypto key generate rsa modulus {{ global.ssh.modulus }}
+ssh key rsa {{ global.ssh.modulus }}
+
+!
+!! END SSH

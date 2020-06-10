@@ -1,0 +1,8 @@
+!! BEGIN L2 VLANS
+!
+{% for item in vlans %}
+vlan {{ item.vlannr }}
+ name {{ item.desc }}
+{% endfor %}
+!
+!! END VLANs

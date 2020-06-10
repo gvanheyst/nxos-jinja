@@ -1,0 +1,97 @@
+!! BEGIN INTERFACES CONFIG
+{% macro apply_vpc(ifnum) %}
+{% if ifnum.peerlink is defined %}
+ vpc peer-link
+ lacp vpc-convergence
+{% else %}
+ vpc {{ ifnum.groupnr }}
+{% endif %}
+{% endmacro %}
+{% macro apply_trunk(ifnum) %}
+ switchport
+ switchport mode trunk
+{% if ifnum.vlans is defined %}
+ switchport trunk allowed vlan {{ ifnum.vlans }}
+{% else %}
+{% if ifnum.exluded is defined %}
+ switchport trunk allowed vlan except {{ ifnum.excluded }}
+{% else %}
+ switchport trunk allowed vlan all
+{% endif %}
+{% endif %}
+{% if ifnum.native is defined %}
+ switchport trunk native vlan {{ ifnum.native }}
+{% endif %}
+{% endmacro %}
+{% macro apply_access(ifnum) %}
+ switchport
+ switchport host
+{% if ifnum.vlan is defined %}
+ switchport access vlan {{ ifnum.vlan }}
+{% endif %}
+{% endmacro %}
+{% macro apply_portchannel(ifnum) %}
+ switchport
+ channel-group {{ ifnum.group }} mode active
+{% endmacro %}
+{% macro apply_routed(ifnum) %}
+ no switchport
+{% if ifnum.vrf is defined %}
+ vrf member {{ ifnum.vrf }}
+{% endif %}
+{% if ifnum.ip and ifnum.subnet is defined %}
+ ip address {{ ifnum.ip }} {{ ifnum.subnet }}
+{% endif %}
+{% if ifnum.hsrp is defined %}
+ hsrp {{ ifnum.ifnr }}
+  ip {{ ifnum.hsrp }}
+{% endif %}
+{% if ifnum.prio is defined %}
+  priority {{ ifnum.prio }}
+  preempt
+{% endif %}
+{% endmacro %}
+{% macro apply_disabled(ifnum) %}
+  shutdown
+{% endmacro %}
+
+!
+{% if switch is defined %}
+{% for ifnum in switch %}
+interface {{ ifname }}/{{ ifnum.ifnr }}
+ description {{ ifnum.description }}
+{% if 'trunk' in ifnum.iftype %}{#TRUNKING#}{{ apply_trunk(ifnum) }}{% endif %}
+{% if 'access' in ifnum.iftype %}{#ACCESS#}{{ apply_access(ifnum) }}{% endif %}
+{% if 'port-channel' in ifnum.iftype %}{#PORTCHANNEL on INTERFACES#}{{ apply_portchannel(ifnum)}}{% endif %}
+{% if 'routed' in ifnum.iftype %}{#ROUTED#}{{(apply_routed(ifnum))}}{% endif %}
+{% if ifnum.down is defined %} shutdown{% else %} no shutdown
+{% endif %}
+!
+{% endfor %}
+{% endif %}
+!
+{% if portchannel is defined %}
+{% for ifnum in portchannel %}
+interface port-channel {{ ifnum.groupnr }}
+ description {{ ifnum.description }}
+{% if 'access' in ifnum.iftype %}{#ACCESS#}{{ apply_access(ifnum) }}{% endif %}
+{% if 'trunk' in ifnum.iftype %}{#TRUNKING#}{{ apply_trunk(ifnum) }}{% endif %}
+{% if ifnum.vpc is defined %}{#VPC#}{{(apply_vpc(ifnum))}}{% endif %}
+{% if 'routed' in ifnum.iftype %}{#ROUTED#}{{(apply_routed(ifnum))}}{% endif %}
+{% if ifnum.down is defined %} shutdown{% else %} no shutdown
+{% endif %}
+!
+{% endfor %}
+{% endif %}
+!
+{% if svi is defined %}
+{% for ifnum in svi %}
+interface vlan {{ ifnum.ifnr }}
+ description {{ ifnum.description }}
+{% if 'routed' in ifnum.iftype %}{#ROUTED#}{{(apply_routed(ifnum))}}{% endif %}
+{% if ifnum.down is defined %} shutdown{% else %} no shutdown{% endif %}
+
+!
+{% endfor %}
+{% endif %}
+!! END INTERFACES

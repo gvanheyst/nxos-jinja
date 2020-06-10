@@ -1,0 +1,16 @@
+!! BEGIN VTY config
+!
+ip access-list {{ global.vty.aclname }}
+{% for IPs in global.vty.aclhosts %}
+ permit ip host {{ IPs }} any log
+{% endfor %}
+{% for IPs in global.vty.aclsubnets %}
+ permit ip {{ IPs }} any log
+{% endfor %}
+line vty
+ access-class {{ global.vty.aclname }} in
+ exec-timeout {{ global.vty.timeout }}
+ session-limit 3
+
+!
+!! END VTY

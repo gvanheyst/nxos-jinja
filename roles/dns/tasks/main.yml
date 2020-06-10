@@ -1,0 +1,7 @@
+---
+- name: Compile DNS config
+  delegate_to: localhost
+  template: src={{ os }}/dns.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_dns.cfg
+  tags:
+    - compile
+

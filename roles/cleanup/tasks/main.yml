@@ -1,0 +1,16 @@
+---
+- name: Delete Staging Directories
+  file: path=/tmp/staging/{{ inventory_hostname }}/ state=absent
+  ignore_errors: True
+
+- name: Delete Complete Directories
+  file: path=/tmp/complete/ state=absent
+  ignore_errors: True
+
+- name: Delete Running Directories
+  file: path=/tmp/running/ state=absent
+  ignore_errors: True
+
+- name: Delete Diff Directories
+  file: path=/tmp/running/ state=absent
+  ignore_errors: True

@@ -1,0 +1,72 @@
+---
+- set_fact:
+    end_datetime: "{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+    run_once: true
+
+- name: Getting IOS Configurations
+  block:
+    - name: Pull IOS device configurations method 1
+      ios_config:
+        backup: yes
+        backup_options:
+          filename: "{{ inventory_hostname }}_running.{{ end_datetime }}.cfg"
+          dir_path: "{{ dir_backup }}"
+      register: ios_running_backup
+      changed_when: false
+      retries: 3
+      delay: 30
+      until: ios_running_backup.failed == false
+  rescue:
+    - name: Pull IOS device configurations method 2
+      ios_command:
+        commands:
+          - show running-configuration
+        register: ios_running_backup
+        changed_when: false
+        retries: 3
+        delay: 30
+        until: ios_running_backup.failed == false
+    - name: Store results
+      copy:
+        dest: "{{ dir_backup }}/{{ inventory_hostname }}_running.{{ end_datetime }}.cfg"
+        content: "{{ ios_running_backup.stdout_lines }}"
+        backup: yes
+  when: os == "ios"
+
+- name: Getting NXOS Configurations
+  block:
+    - name: Pull method 1 (nxos_config)
+      nxos_config:
+        backup: yes
+        backup_options:
+          filename: "{{ inventory_hostname }}_running.{{ end_datetime }}.cfg"
+          dir_path: "{{ dir_backup }}"
+      register: nxos_running_backup
+      changed_when: false
+      retries: 3
+      delay: 30
+      until: nxos_running_backup.failed == false
+
+  rescue:
+    - name: Pull method 2 (nxos_command)
+      nxos_command:
+        commands:
+          - show running-configuration
+      register: nxos_running_backup
+      changed_when: false
+      retries: 3
+      delay: 30
+      until: nxos_running_backup.failed == false
+    - name: Store results
+      copy:
+        dest: "{{ dir_backup }}/{{ inventory_hostname }}_running.{{ end_datetime }}.cfg"
+        content: "{{ nxos_running_backup.stdout_lines }}"
+        backup: yes
+  when: os == "nxos"
+
+- name: Remove timestamps from file
+  lineinfile:
+    path: "{{ dir_backup }}/{{ inventory_hostname }}_running.{{ end_datetime }}.cfg"
+    state: absent
+    regexp: '^!(Time|Running|Command)'
+  changed_when: false

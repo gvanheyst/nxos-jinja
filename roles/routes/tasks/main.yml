@@ -1,0 +1,6 @@
+---
+- name: Compile Routes config
+  delegate_to: localhost
+  template: src={{ os }}/routes.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_routes.cfg
+  tags:
+    - compile

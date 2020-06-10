@@ -1,0 +1,9 @@
+!! BEGIN DNS
+!
+no ip domain-lookup
+ip domain-name {{ global.hostname|lower }}.{{ global.dnsdomain }}
+{% for server in global.dnsserver %}
+ip name-server {{ server }}
+{% endfor %}
+!
+!! END DNS

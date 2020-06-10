@@ -1,0 +1,7 @@
+---
+- name: Compile config
+  delegate_to: localhost
+  template: src={{ os }}/logging.j2 dest=  dest=/tmp/staging/{{ inventory_hostname }}/{{ inventory_hostname }}_logging.cfg
+  tags:
+    - compile
+

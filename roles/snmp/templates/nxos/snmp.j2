@@ -1,0 +1,20 @@
+!! BEGIN SNMP
+ip access-list {{ global.snmp.aclname }}
+{% for IPs in global.snmp.aclhosts %}
+ permit ip host {{ IPs }} any log
+{% endfor %}
+{% for IPs in global.snmp.aclsubnets %}
+ permit ip {{ IPs }} any log
+{% endfor %}
+
+snmp-server protocol enable
+snmp-server location {{ site_code }}
+snmp-server contact {{ global.snmp.contact }}
+! - SNMP v2
+snmp-server community {{ global.snmp.community }} RO
+snmp-server community {{ global.snmp.community }} use-acl {{ global.snmp.aclname }}
+snmp-server user admin network-admin
+snmp-server user admin use-ipv4acl {{ global.snmp.aclname }}
+snmp-server user {{ global.fallback.user }} network-admin
+snmp-server user {{ global.fallback.user }} use-ipv4acl {{ global.snmp.aclname }}
+!! END SNMP
