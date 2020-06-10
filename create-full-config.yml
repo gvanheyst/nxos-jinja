@@ -1,0 +1,36 @@
+---
+- name: Generate Baseline Config(s)
+  hosts: all
+  connection: local
+  gather_facts: false
+
+  pre_tasks:
+    - name: Create temporary storage directory within the staging directory
+      file: path=/tmp/staging/{{ inventory_hostname }}/ state=directory
+    - name: Create Output directory within the staging directory
+      file:
+        path: "{{ dir_backup }}"
+        state: directory
+
+  roles:
+  - baseline
+  - vlans
+  - banners
+  - aaa
+  - dns
+  - logging
+  - ntp
+  - snmp
+  - ssh
+  - vty
+  - interfaces
+  - routes
+
+  post_tasks:
+    - set_fact:
+        end_datetime: "{{ lookup('pipe','date +%Y%m%d%H%M%S') }}"
+      run_once: true
+    - name: Append templates together to create final baseline configuration file
+      assemble: src=/tmp/staging/{{ inventory_hostname }}/ dest={{ dir_backup }}/{{ inventory_hostname }}_GENERATED.{{ end_datetime }}.cfg
+    # - name: Remove Temporary storage directory
+    #   file: path=/tmp/staging/ state=absent
